@@ -200,21 +200,7 @@ def show_venue(venue_id):
   
   venue = Venue.query.get(venue_id)
   if venue:
-    data={
-      "id": venue.id,
-      "name": venue.name,
-      "genres": venue.genres,
-      "address": venue.address,
-      "city": venue.city,
-      "state": venue.state,
-      "phone": venue.phone,
-      "website": venue.website,
-      "facebook_link": venue.facebook_link,
-      "seeking_talent": True if venue.seeking_talent in (True, 't', 'True') else False,
-      "seeking_description": venue.seeking_description,
-      "image_link": venue.image_link if venue.image_link else "",
-    }
-  past_shows = []
+      past_shows = []
   for show in venue.past_shows():
     artist = Artist.query.get(show.artist_id)
     past_shows.append({
@@ -234,11 +220,23 @@ def show_venue(venue_id):
         "start_time": str(show.start_time)
     })
 
-  data["past_shows"] = past_shows
-  data["upcoming_shows"] = upcoming_shows
-  data["past_shows_count"]: len(past_shows)
-  data["upcoming_shows_count"]: len(upcoming_shows)
-  return render_template('pages/show_venue.html', venue=data)
+    data={
+      "id": venue.id,
+      "name": venue.name,
+      "genres": venue.genres,
+      "address": venue.address,
+      "city": venue.city,
+      "state": venue.state,
+      "phone": venue.phone,
+      "website": venue.website,
+      "facebook_link": venue.facebook_link,
+      "seeking_talent": True if venue.seeking_talent in (True, 't', 'True') else False,
+      "seeking_description": venue.seeking_description,
+      "image_link": venue.image_link if venue.image_link else "",
+      "past_shows" : past_shows,
+      "upcoming_shows" : upcoming_shows
+    }
+    return render_template('pages/show_venue.html', venue=data)
 
 #  Create Venue
 #  ----------------------------------------------------------------
@@ -323,10 +321,40 @@ def search_artists():
 
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
-  # shows the venue page with the given venue_id
-  # TODO: replace with real venue data from the venues table, using venue_id
-  
-  data = []
+  artist = Artist.query.get(artist_id)
+  past_shows = []
+  for show in artist.past_shows():    
+    venue = Venue.query.get(show.venue_id)
+    past_shows.append({
+      "venue_id": venue.id,
+      "venue_name": venue.name,
+      "venue_image_link": venue.image_link,
+      "start_time": str(show.start_time)
+    })
+  coming_shows = []
+  for show in artist.coming_shows():
+    venue = Venue.query.get(show.venue_id)
+    coming_shows.append({
+        "venue_id": venue.id,
+        "venue_name": venue.name,
+        "venue_image_link": venue.image_link,
+        "start_time": str(show.start_time)
+    })
+  data = {
+      "id": artist.id,
+      "name": artist.name,
+      "genres": artist.genres,
+      "city": artist.city,
+      "state": artist.state,
+      "phone": artist.phone,
+      "seeking_venue": True if artist.seeking_venue in ('y', True, 't', 'True') else False,
+      "seeking_description": artist.seeking_description,
+      "image_link": artist.image_link, #"https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
+      "facebook_link": artist.facebook_link,
+      "website_link": artist.website,
+      "past_shows": past_shows,
+      "upcoming_shows": coming_shows
+  }
   return render_template('pages/show_artist.html', artist=data)
 
 #  Update
