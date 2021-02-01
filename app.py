@@ -297,8 +297,9 @@ def shows():
 
 @app.route('/shows/create')
 def create_shows():
-  # renders form. do not touch.
   form = ShowForm()
+  form.artist_id.choices = [(artist.id,artist.name) for artist in Artist.query]
+  form.venue_id.choices = [(venue.id, venue.name + f' ({venue.city}, {venue.state})') for venue in Venue.query]
   return render_template('forms/new_show.html', form=form)
 
 @app.route('/shows/create', methods=['POST'])
