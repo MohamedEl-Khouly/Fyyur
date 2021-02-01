@@ -23,13 +23,16 @@ class ShowForm(Form):
 
 class VenueForm(Form):
     name = StringField(
-        'name', validators=[DataRequired()]
+        'name', 
+        validators=[DataRequired()]
     )
     city = StringField(
-        'city', validators=[DataRequired()]
+        'city', 
+        validators=[DataRequired()]
     )
     state = SelectField(
-        'state', validators=[DataRequired()],
+        'state', 
+        validators=[DataRequired()],
         choices=[
             ('AL', 'AL'),
             ('AK', 'AK'),
@@ -85,17 +88,25 @@ class VenueForm(Form):
         ]
     )
     address = StringField(
-        'address', validators=[DataRequired()]
+        'address',
+        validators=[DataRequired()]
     )
     phone = StringField(
-        'phone'
+        'phone',
+        validators=[
+          DataRequired(),
+          Regexp(
+            '^\d{3}-\d{3}-\d{4}$',
+            message='phone is not in the correct format: ' + 'xxx-xxx-xxxx'
+          )
+        ]
     )
     image_link = StringField(
         'image_link'
     )
     genres = SelectMultipleField(
-        # TODO implement enum restriction
-        'genres', validators=[DataRequired()],
+        'genres',
+        validators=[DataRequired()],
         choices=[
             ('Alternative', 'Alternative'),
             ('Blues', 'Blues'),
@@ -119,7 +130,21 @@ class VenueForm(Form):
         ]
     )
     facebook_link = StringField(
-        'facebook_link', validators=[URL()]
+        'facebook_link', 
+        validators=[URL()]
+    )
+    website_link = StringField(
+        'website_link', 
+        validators=[URL()]
+    )    
+    seeking_talent = SelectField(
+        'seeking_talent',
+        validators=[DataRequired()],
+        choices=[(True, 'Yes'), (False,'No')]
+    )
+    
+    seeking_description = StringField(
+        'seeking_description'
     )
 
 class ArtistForm(Form):
@@ -229,12 +254,6 @@ class ArtistForm(Form):
     image_link = StringField(
         'image_link'
     )
-    """ 
-    genres = SelectMultipleField(
-        # TODO implement enum restriction
-        'genres', validators=[DataRequired()],
-        choices = get_genre_choices(Genre)
-    ) """
     website_link = StringField(
         'website_link', 
         validators=[URL()]
@@ -248,5 +267,3 @@ class ArtistForm(Form):
     seeking_description = StringField(
         'seeking_description'
     )
-
-# TODO IMPLEMENT NEW ARTIST FORM AND NEW SHOW FORM
