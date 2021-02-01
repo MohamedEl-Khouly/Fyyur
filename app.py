@@ -13,6 +13,7 @@ import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
+from sqlalchemy.exc import SQLAlchemyError
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -80,7 +81,7 @@ class Venue(db.Model):
       shows = self.shows.query.filter_by(Show.start_time > currentTime).all()
       return shows
 
-      
+
 class Artist(db.Model):
     __tablename__ = 'artists'
 
@@ -214,15 +215,44 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
-
-  # on successful db insert, flash success
-  flash('Venue ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
-  return render_template('pages/home.html')
+  try :
+    name = request.form.get('name')
+    city = request.form.get('city')
+    state = request.form.get('state')
+    phone = request.form.get('phone')
+    address = request.form.get('address')
+    website_link = request.form.get('website_link')
+    facebook_link = request.form.get('facebook_link')
+    if request.form.get('seeking_talent') in ('y', True, 't', 'True'):
+      seeking_talent = True
+    else:
+      seeking_talent = False
+    seeking_description = request.form.get('seeking_description')
+    genres = request.form.getlist('genres')
+    new_venue = Venue(
+      name= name,
+      city= city,
+      state= state,
+      phone= phone,
+      address= address,
+      facebook_link=facebook_link,
+      website= website_link,
+      seeking_talent= seeking_talent,
+      seeking_description= seeking_description,
+      genres= genres
+    )
+    print(new_venue)
+    db.session.add(new_venue)
+    db.session.commit()
+    flash('Venue ' + new_venue.name + ' was successfully listed!', category='message')
+  except SQLAlchemyError as e:
+    error = str(e.__dict__['orig'])
+    flash('An error occurred. Show could not be listed. \n' + error,category='error')
+    db.session.rollback()
+    flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.',category= error)
+  finally:
+    db.session.close()
+  return render_template('pages/venues.html')
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):

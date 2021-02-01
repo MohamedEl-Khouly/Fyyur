@@ -2,7 +2,7 @@ from datetime import datetime
 from flask_wtf import Form
 from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField
 from wtforms.validators import DataRequired, AnyOf, URL, Regexp
-
+from wtforms.fields.core import BooleanField
 
 class ShowForm(Form):
     artist_id = SelectField(
@@ -137,10 +137,8 @@ class VenueForm(Form):
         'website_link', 
         validators=[URL()]
     )    
-    seeking_talent = SelectField(
-        'seeking_talent',
-        validators=[DataRequired()],
-        choices=[(True, 'Yes'), (False,'No')]
+    seeking_talent = BooleanField(
+        'seeking_talent'
     )
     
     seeking_description = StringField(
@@ -258,11 +256,8 @@ class ArtistForm(Form):
         'website_link', 
         validators=[URL()]
     )
-    seeking_venue = SelectField(
-        'seeking_venue',
-        validators=[DataRequired()],
-        choices=[(True, 'Yes'), (False,'No')]
-        
+    seeking_venue = BooleanField(
+        'seeking_venue'        
     )
     seeking_description = StringField(
         'seeking_description'
