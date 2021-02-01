@@ -49,7 +49,7 @@ class Venue(db.Model):
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     website = db.Column(db.String(120))
-    genres = db.Column(db.ARRAY(db.String(120))))
+    genres = db.Column(db.ARRAY(db.String()))
     seeking_talent = db.Column(db.Boolean, default=False)
     seeking_description = db.Column(db.Text, nullable=True)
 
@@ -62,20 +62,15 @@ class Venue(db.Model):
     )
 
     def __repr__(self):
-      massege = f'< 
-      Venue {self.id},
-      name: {self.name},
-      area: {self.city},{self.state},
-      phone: {self.phone},
-      address: {self.address},
-      seeking Talent: {self.seeking_talent},
-      >'
+      massege = f'< Venue {self.id}\nname: {self.name}\narea: {self.city},{self.state}\nphone: {self.phone}\naddress: {self.address}\nseeking Talent: {self.seeking_talent}\ngenres: {self.genres}>'
       return massege
 
 class Artist(db.Model):
     __tablename__ = 'artists'
 
     # Table Columns
+    id = db.Column(db.Integer, primary_key=True)
+
     name = db.Column(db.String, nullable=False)
     city = db.Column(db.String(120), nullable=False)
     state = db.Column(db.String(120), nullable=False)
@@ -83,7 +78,7 @@ class Artist(db.Model):
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     website = db.Column(db.String(120))
-    genres = db.Column(db.ARRAY(db.String(120))))
+    genres = db.Column(db.ARRAY(db.String()))
     seeking_venue = db.Column(db.Boolean, default=False)
     seeking_description = db.Column(db.Text, nullable=True)
 
@@ -96,13 +91,7 @@ class Artist(db.Model):
     )
 
     def __repr__(self):
-      massege = f'< 
-      Venue {self.id},
-      name: {self.name},
-      area: {self.city},{self.state},
-      phone: {self.phone},
-      seeking Talent: {self.seeking_talent},
-      >'
+      massege = f'< Artist {self.id}\nname: {self.name}\narea: {self.city},{self.state}\nphone: {self.phone}\nseeking Talent: {self.seeking_talent}\ngenres: {self.genres}>'
       return massege
 
 
@@ -115,12 +104,12 @@ class Show(db.Model):
   start_time = db.Column(db.DateTime, nullable=False)
   venue_id = db.Column(
     db.Integer,
-    db.ForeginKey('venues.id'),
+    db.ForeignKey('venues.id'),
     nullable=False
   )
   artist_id = db.Column(
     db.Integer,
-    db.ForeginKey('artists.id'),
+    db.ForeignKey('artists.id'),
     nullable=False
   )
 
