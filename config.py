@@ -8,6 +8,8 @@ DEBUG = True
 
 # Connect to the database
 
-
-# TODO IMPLEMENT DATABASE URL
-SQLALCHEMY_DATABASE_URI = '<Put your local database url>'
+# USER and PASSWORD are set as enviroment variables in The enviroment.  
+# Replace with your Postgres user and password
+USER = os.environ.get('POSTGRES_USER')
+PASSWORD = os.environ.get('POSTGRES_PASS')
+SQLALCHEMY_DATABASE_URI = f'postgres://{USER}:{PASSWORD}@localhost:5432/fyyurapp'
