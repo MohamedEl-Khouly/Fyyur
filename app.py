@@ -71,14 +71,12 @@ class Venue(db.Model):
     #List of Id's for past shows
     def past_shows(self):
       currentTime = datetime.now()
-      shows = self.shows.query.filter_by(Show.start_time <= currentTime).all()
-      #shows = [show for show in self.shows if show.start_time <= datetime.now()]
+      shows = [show for show in self.shows if show.start_time <= datetime.now()]
       return shows
       
     #List of Id's for coming shows
     def coming_shows(self):
-      #shows = [show for show in self.shows if show.start_time > datetime.now()]
-      shows = self.shows.query.filter_by(Show.start_time > currentTime).all()
+      shows = [show for show in self.shows if show.start_time > datetime.now()]
       return shows
 
 
@@ -116,14 +114,14 @@ class Artist(db.Model):
     #List of Id's for past shows
     def past_shows(self):
       currentTime = datetime.now()
-      shows = self.shows.query.filter_by(Show.start_time <= currentTime).all()
-      #shows = [show for show in self.shows if show.start_time <= datetime.now()]
+      #shows = self.shows.query.filter_by(Show.start_time <= currentTime).all()
+      shows = [show for show in self.shows if show.start_time <= datetime.now()]
       return shows
 
     #List of Id's for coming shows
     def coming_shows(self):
-      #shows = [show for show in self.shows if show.start_time > datetime.now()]
-      shows = self.shows.query.filter_by(Show.start_time > currentTime).all()
+      shows = [show for show in self.shows if show.start_time > datetime.now()]
+      #shows = self.shows.query.filter_by(Show.start_time > currentTime).all()
       return shows
 
 class Show(db.Model):
@@ -199,10 +197,47 @@ def search_venues():
 
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
-  # shows the venue page with the given venue_id
-  # TODO: replace with real venue data from the venues table, using venue_id
   
-  data = []
+  venue = Venue.query.get(venue_id)
+  if venue:
+    data={
+      "id": venue.id,
+      "name": venue.name,
+      "genres": venue.genres,
+      "address": venue.address,
+      "city": venue.city,
+      "state": venue.state,
+      "phone": venue.phone,
+      "website": venue.website,
+      "facebook_link": venue.facebook_link,
+      "seeking_talent": True if venue.seeking_talent in (True, 't', 'True') else False,
+      "seeking_description": venue.seeking_description,
+      "image_link": venue.image_link if venue.image_link else "",
+    }
+  past_shows = []
+  for show in venue.past_shows():
+    artist = Artist.query.get(show.artist_id)
+    past_shows.append({
+        "artist_id": show.artist_id,
+        "artist_name": artist.name,
+        "artist_image_link": artist.image_link,
+        "start_time": str(show.start_time)
+    })
+    
+  upcoming_shows = []
+  for show in venue.coming_shows():
+    artist = Artist.query.get(show.artist_id)
+    upcoming_shows.append({
+        "artist_id": show.artist_id,
+        "artist_name": artist.name,
+        "artist_image_link": artist.image_link,
+        "start_time": str(show.start_time)
+    })
+
+  data["past_shows"] = past_shows
+  data["upcoming_shows"] = upcoming_shows
+  data["past_shows_count"]: len(past_shows)
+  data["upcoming_shows_count"]: len(upcoming_shows)
   return render_template('pages/show_venue.html', venue=data)
 
 #  Create Venue
