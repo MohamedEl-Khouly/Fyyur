@@ -1,7 +1,8 @@
 from datetime import datetime
 from flask_wtf import Form
 from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField
-from wtforms.validators import DataRequired, AnyOf, URL
+from wtforms.validators import DataRequired, AnyOf, URL, Regexp
+
 
 class ShowForm(Form):
     artist_id = SelectField(
@@ -123,13 +124,16 @@ class VenueForm(Form):
 
 class ArtistForm(Form):
     name = StringField(
-        'name', validators=[DataRequired()]
+        'name', 
+        validators=[DataRequired()]
     )
     city = StringField(
-        'city', validators=[DataRequired()]
+        'city', 
+        validators=[DataRequired()]
     )
     state = SelectField(
-        'state', validators=[DataRequired()],
+        'state', 
+        validators=[DataRequired()],
         choices=[
             ('AL', 'AL'),
             ('AK', 'AK'),
@@ -184,16 +188,9 @@ class ArtistForm(Form):
             ('WY', 'WY'),
         ]
     )
-    phone = StringField(
-        # TODO implement validation logic for state
-        'phone'
-    )
-    image_link = StringField(
-        'image_link'
-    )
     genres = SelectMultipleField(
-        # TODO implement enum restriction
-        'genres', validators=[DataRequired()],
+        'genres', 
+        validators=[DataRequired()],
         choices=[
             ('Alternative', 'Alternative'),
             ('Blues', 'Blues'),
@@ -217,8 +214,39 @@ class ArtistForm(Form):
         ]
     )
     facebook_link = StringField(
+        'facebook_link',
+         validators=[URL()]
+    )
+    phone = StringField(
+        'phone',
+        validators=[
+          Regexp(
+            '^\d{3}-\d{3}-\d{4}$',
+            message='phone is not in the correct format: ' + 'xxx-xxx-xxxx'
+          )
+        ]
+    )
+    image_link = StringField(
+        'image_link'
+    )
+    """ 
+    genres = SelectMultipleField(
         # TODO implement enum restriction
-        'facebook_link', validators=[URL()]
+        'genres', validators=[DataRequired()],
+        choices = get_genre_choices(Genre)
+    ) """
+    website_link = StringField(
+        'website_link', 
+        validators=[URL()]
+    )
+    seeking_venue = SelectField(
+        'seeking_venue',
+        validators=[DataRequired()],
+        choices=[(True, 'Yes'), (False,'No')]
+        
+    )
+    seeking_description = StringField(
+        'seeking_description'
     )
 
 # TODO IMPLEMENT NEW ARTIST FORM AND NEW SHOW FORM
