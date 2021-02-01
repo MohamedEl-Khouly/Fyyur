@@ -30,10 +30,10 @@ migrate = Migrate(app, db)
 #Models are the database schema
 #They are built using Flask-sqlAlchemy ORM
 #The app has Three models(tables)
-#1. Venue: holds data of venues and holds one-many relationship with shows
-#2. Aritist: holds data for artist and holds one-many relationship with shows
-#3. Show: holds data for Shows and relate artist to venue in a many-many relationship
-
+####1. Venue: holds data of venues and holds one-many relationship with shows
+####2. Aritist: holds data for artist and holds one-many relationship with shows
+####3. Show: holds data for Shows and relate artist to venue in a many-many relationship
+#Some helper methods are defined in Venue and Artist to help in querries 
 
 class Venue(db.Model):
     __tablename__ = 'venues'
@@ -64,7 +64,23 @@ class Venue(db.Model):
     def __repr__(self):
       massege = f'< Venue {self.id}\nname: {self.name}\narea: {self.city},{self.state}\nphone: {self.phone}\naddress: {self.address}\nseeking Talent: {self.seeking_talent}\ngenres: {self.genres}>'
       return massege
+    
+    #helper methods
+    # ___________________________ 
+    #List of Id's for past shows
+    def past_shows(self):
+      currentTime = datetime.now()
+      shows = self.shows.query.filter_by(Show.start_time <= currentTime).all()
+      #shows = [show for show in self.shows if show.start_time <= datetime.now()]
+      return shows
+      
+    #List of Id's for coming shows
+    def coming_shows(self):
+      #shows = [show for show in self.shows if show.start_time > datetime.now()]
+      shows = self.shows.query.filter_by(Show.start_time > currentTime).all()
+      return shows
 
+      
 class Artist(db.Model):
     __tablename__ = 'artists'
 
@@ -93,7 +109,21 @@ class Artist(db.Model):
     def __repr__(self):
       massege = f'< Artist {self.id}\nname: {self.name}\narea: {self.city},{self.state}\nphone: {self.phone}\nseeking Talent: {self.seeking_talent}\ngenres: {self.genres}>'
       return massege
+    
+    #helper methods
+    # ___________________________ 
+    #List of Id's for past shows
+    def past_shows(self):
+      currentTime = datetime.now()
+      shows = self.shows.query.filter_by(Show.start_time <= currentTime).all()
+      #shows = [show for show in self.shows if show.start_time <= datetime.now()]
+      return shows
 
+    #List of Id's for coming shows
+    def coming_shows(self):
+      #shows = [show for show in self.shows if show.start_time > datetime.now()]
+      shows = self.shows.query.filter_by(Show.start_time > currentTime).all()
+      return shows
 
 class Show(db.Model):
   __tablename__ = 'shows'
