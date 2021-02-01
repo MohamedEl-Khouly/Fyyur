@@ -108,7 +108,7 @@ class Artist(db.Model):
     )
 
     def __repr__(self):
-      massege = f'< Artist {self.id}\nname: {self.name}\narea: {self.city},{self.state}\nphone: {self.phone}\nseeking Talent: {self.seeking_talent}\ngenres: {self.genres}>'
+      massege = f'< Artist {self.id}\nname: {self.name}\narea: {self.city},{self.state}\nphone: {self.phone}\nseeking_venue: {self.seeking_venue}\ngenres: {self.genres}>'
       return massege
     
     #helper methods
@@ -146,7 +146,7 @@ class Show(db.Model):
 
 
   def __repr__(self):
-    massege = f'< >'
+    massege = f'< Show {self.id}\n Starts at {self.start_time}\nartist {self.artist_id}\n venue {self.venue_id}>'
     return massege
 
 #----------------------------------------------------------------------------#
@@ -333,15 +333,41 @@ def create_artist_form():
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
-  # called upon submitting the new artist listing form
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
-
-  # on successful db insert, flash success
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
-  return render_template('pages/home.html')
+  try :
+    name = request.form.get('name')
+    city = request.form.get('city')
+    state = request.form.get('state')
+    phone = request.form.get('phone')
+    website_link = request.form.get('website_link')
+    facebook_link = request.form.get('facebook_link')
+    if request.form.get('seeking_venue') in ('y', True, 't', 'True'):
+      seeking_venue = True
+    else:
+      seeking_venue = False
+    seeking_description = request.form.get('seeking_description')
+    genres = request.form.getlist('genres')
+    new_artist = Artist(
+      name= name,
+      city= city,
+      state= state,
+      phone= phone,
+      facebook_link=facebook_link,
+      website= website_link,
+      seeking_venue= seeking_venue,
+      seeking_description= seeking_description,
+      genres= genres
+    )
+    print(new_artist)
+    db.session.add(new_artist)
+    db.session.commit()
+    flash('Artist ' + new_artist.name + ' was successfully listed!', category='message')
+  except SQLAlchemyError as e:
+    error = str(e.__dict__['orig'])
+    db.session.rollback()
+    flash('An error occurred. Artist' + request.form['name'] + ' could not be listed.',category= error)
+  finally:
+    db.session.close()
+  return render_template('pages/artists.html')
 
 
 #  Shows
