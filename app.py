@@ -169,7 +169,6 @@ app.jinja_env.filters['datetime'] = format_datetime
 def index():
   artists = Artist.query.order_by(desc(Artist.id)).limit(10).all()
   venues = Venue.query.order_by(desc(Venue.id)).limit(10).all()
-  print(venues)
   return render_template('pages/home.html',artists=artists,venues=venues)
 
 
@@ -183,11 +182,11 @@ def venues():
   areas = Venue.query.with_entities(Venue.city, Venue.state).distinct().all()
   for area in areas:
     city,state = area
-    venues =  Venue.query.filter_by(city=city, state=state).all()
+    venues_in_area =  Venue.query.filter_by(city=city, state=state).all()
     data.append({
       'city': city,
       'state': state,
-      'venues': venues
+      'venues': venues_in_area
     })
   return render_template('pages/venues.html', areas=data)
 
@@ -198,7 +197,6 @@ def search_venues():
   data = []
   
   for venue in venues:
-    print((venue.name))
     data.append({
       "id": venue.id,
       "name": venue.name,
@@ -291,7 +289,6 @@ def create_venue_submission():
       genres= genres,
       image_link=image_link
     )
-    print(new_venue)
     db.session.add(new_venue)
     db.session.commit()
     flash('Venue ' + new_venue.name + ' was successfully listed!')
@@ -477,7 +474,6 @@ def create_artist_submission():
       genres= genres,
       image_link= image_link
     )
-    print(new_artist)
     db.session.add(new_artist)
     db.session.commit()
     flash('Artist ' + new_artist.name + ' was successfully listed!')
@@ -525,7 +521,6 @@ def create_show_submission():
       venue_id= venue_id,
       artist_id= artist_id
     )
-    print(Show)
     db.session.add(new_show)
     db.session.commit()
     flash('Show was successfully listed!')
