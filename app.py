@@ -360,15 +360,34 @@ def show_artist(artist_id):
 #  ----------------------------------------------------------------
 @app.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
-  form = ArtistForm()
-  artist={}
-  # TODO: populate form with fields from artist with ID <artist_id>
+  artist=Artist.query.get(artist_id)
+  form = ArtistForm(obj=artist)
   return render_template('forms/edit_artist.html', form=form, artist=artist)
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
-  # TODO: take values from the form submitted, and update existing
-  # artist record with ID <artist_id> using the new attributes
+  try :
+    artist=Artist.query.get(artist_id)
+    artist.name = request.form.get('name')
+    artist.city = request.form.get('city')
+    artist.state = request.form.get('state')
+    artist.phone = request.form.get('phone')
+    artist.website = request.form.get('website_link')
+    artist.facebook_link = request.form.get('facebook_link')
+    if request.form.get('seeking_venue') in ('y', True, 't', 'True'):
+      artist.seeking_venue = True
+    else:
+      artist.seeking_venue = False
+    artist.seeking_description = request.form.get('seeking_description')
+    artist.genres = request.form.getlist('genres')
+    artist.image_link = request.form.get('image_link')
+    db.session.commit()
+    flash('Artist ' + new_artist.name + ' was successfully Updated!')
+  except :
+    db.session.rollback()
+    flash('An error occurred. Artist' + request.form['name'] + ' could not be Updated.')
+  finally:
+    db.session.close()
 
   return redirect(url_for('show_artist', artist_id=artist_id))
 
