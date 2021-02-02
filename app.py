@@ -176,6 +176,16 @@ def index():
 @app.route('/venues')
 def venues():
   data=[]
+  # areas are the Distinct ( City,state) combinations avilable in the Data set
+  areas = Venue.query.with_entities(Venue.city, Venue.state).distinct().all()
+  for area in areas:
+    city,state = area
+    venues =  Venue.query.filter_by(city=city, state=state).all()
+    data.append({
+      'city': city,
+      'state': state,
+      'venues': venues
+    })
   return render_template('pages/venues.html', areas=data)
 
 @app.route('/venues/search', methods=['POST'])
