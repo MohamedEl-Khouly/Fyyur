@@ -438,10 +438,17 @@ def create_artist_submission():
 
 @app.route('/shows')
 def shows():
-  # displays list of shows at /shows
-  # TODO: replace with real venues data.
-  #       num_shows should be aggregated based on number of upcoming shows per venue.
   data=[]
+  shows= Show.query.all()
+  for show in shows:
+    data.append({
+      'start_time': str(show.start_time),
+      'venue_id': show.venue_id,
+      'artist_id': show.artist_id,
+      'venue_name': show.venue.name,
+      'artist_name':show.artist.name,
+      'artist_image_link':show.artist.image_link,
+    })
   return render_template('pages/shows.html', shows=data)
 
 @app.route('/shows/create')
