@@ -279,12 +279,10 @@ def create_venue_submission():
     print(new_venue)
     db.session.add(new_venue)
     db.session.commit()
-    flash('Venue ' + new_venue.name + ' was successfully listed!', category='message')
-  except SQLAlchemyError as e:
-    error = str(e.__dict__['orig'])
-    flash('An error occurred. Show could not be listed. \n' + error,category='error')
+    flash('Venue ' + new_venue.name + ' was successfully listed!')
+  except :
     db.session.rollback()
-    flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.',category= error)
+    flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
   finally:
     db.session.close()
   return render_template('pages/venues.html')
@@ -351,7 +349,7 @@ def show_artist(artist_id):
       "phone": artist.phone,
       "seeking_venue": True if artist.seeking_venue in ('y', True, 't', 'True') else False,
       "seeking_description": artist.seeking_description,
-      "image_link": artist.image_link, #"https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
+      "image_link": artist.image_link, 
       "facebook_link": artist.facebook_link,
       "website_link": artist.website,
       "past_shows": past_shows,
@@ -427,11 +425,10 @@ def create_artist_submission():
     print(new_artist)
     db.session.add(new_artist)
     db.session.commit()
-    flash('Artist ' + new_artist.name + ' was successfully listed!', category='message')
-  except SQLAlchemyError as e:
-    error = str(e.__dict__['orig'])
+    flash('Artist ' + new_artist.name + ' was successfully listed!')
+  except :
     db.session.rollback()
-    flash('An error occurred. Artist' + request.form['name'] + ' could not be listed.',category= error)
+    flash('An error occurred. Artist' + request.form['name'] + ' could not be listed.')
   finally:
     db.session.close()
   return render_template('pages/artists.html')
@@ -477,10 +474,9 @@ def create_show_submission():
     db.session.add(new_show)
     db.session.commit()
     flash('Show was successfully listed!')
-  except SQLAlchemyError as e:
-    error = str(e.__dict__['orig'])
+  except :
     db.session.rollback()
-    flash('An error occurred Show could not be listed.',category= error)
+    flash('An error occurred Show could not be listed.')
   finally:
     db.session.close()
   return render_template('pages/shows.html')
