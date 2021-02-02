@@ -261,6 +261,7 @@ def create_venue_submission():
     else:
       seeking_talent = False
     seeking_description = request.form.get('seeking_description')
+    image_link = request.form.get('image_link')
     genres = request.form.getlist('genres')
     new_venue = Venue(
       name= name,
@@ -272,7 +273,8 @@ def create_venue_submission():
       website= website_link,
       seeking_talent= seeking_talent,
       seeking_description= seeking_description,
-      genres= genres
+      genres= genres,
+      image_link=image_link
     )
     print(new_venue)
     db.session.add(new_venue)
@@ -409,6 +411,7 @@ def create_artist_submission():
       seeking_venue = False
     seeking_description = request.form.get('seeking_description')
     genres = request.form.getlist('genres')
+    image_link = request.form.get('image_link')
     new_artist = Artist(
       name= name,
       city= city,
@@ -418,7 +421,8 @@ def create_artist_submission():
       website= website_link,
       seeking_venue= seeking_venue,
       seeking_description= seeking_description,
-      genres= genres
+      genres= genres,
+      image_link= image_link
     )
     print(new_artist)
     db.session.add(new_artist)
