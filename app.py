@@ -175,10 +175,8 @@ def index():
 
 @app.route('/venues')
 def venues():
-  # TODO: replace with real venues data.
-  #       num_shows should be aggregated based on number of upcoming shows per venue.
   data=[]
-  return render_template('pages/venues.html', areas=data);
+  return render_template('pages/venues.html', areas=data)
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
@@ -517,7 +515,7 @@ def create_show_submission():
     flash('An error occurred Show could not be listed.')
   finally:
     db.session.close()
-  return render_template('pages/shows.html')
+  return redirect(url_for('shows'))
 
 @app.errorhandler(404)
 def not_found_error(error):
