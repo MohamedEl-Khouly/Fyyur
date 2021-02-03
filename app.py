@@ -14,6 +14,7 @@ from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
 from sqlalchemy import func, desc
+from models import db, Artist, Venue, Show
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -21,131 +22,8 @@ from sqlalchemy import func, desc
 app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
-db = SQLAlchemy(app)
-
+db.init_app(app)
 migrate = Migrate(app, db)
-#----------------------------------------------------------------------------#
-# Models.
-#----------------------------------------------------------------------------#
-
-#Models are the database schema
-#They are built using Flask-sqlAlchemy ORM
-#The app has Three models(tables)
-####1. Venue: holds data of venues and holds one-many relationship with shows
-####2. Aritist: holds data for artist and holds one-many relationship with shows
-####3. Show: holds data for Shows and relate artist to venue in a many-many relationship
-#Some helper methods are defined in Venue and Artist to help in querries 
-
-class Venue(db.Model):
-    __tablename__ = 'venues'
-
-    # Table Columns
-    id = db.Column(db.Integer, primary_key=True)
-    
-    name = db.Column(db.String, nullable=False)
-    city = db.Column(db.String(120), nullable=False)
-    state = db.Column(db.String(120), nullable=False)
-    address = db.Column(db.String(120), nullable=False)
-    phone = db.Column(db.String(120))
-    image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
-    website = db.Column(db.String(120))
-    genres = db.Column(db.ARRAY(db.String()))
-    seeking_talent = db.Column(db.Boolean, default=False)
-    seeking_description = db.Column(db.Text, nullable=True)
-
-    # Relationship defination
-    shows = db.relationship(
-      'Show',
-      backref='venue',
-      lazy=True,
-      cascade='all, delete-orphan'
-    )
-
-    def __repr__(self):
-      massege = f'< Venue {self.id}\nname: {self.name}\narea: {self.city},{self.state}\nphone: {self.phone}\naddress: {self.address}\nseeking Talent: {self.seeking_talent}\ngenres: {self.genres}>'
-      return massege
-    
-    #helper methods
-    # ___________________________ 
-    #List of Id's for past shows
-    def past_shows(self):
-      currentTime = datetime.now()
-      shows = [show for show in self.shows if show.start_time <= datetime.now()]
-      return shows
-      
-    #List of Id's for coming shows
-    def coming_shows(self):
-      shows = [show for show in self.shows if show.start_time > datetime.now()]
-      return shows
-
-
-class Artist(db.Model):
-    __tablename__ = 'artists'
-
-    # Table Columns
-    id = db.Column(db.Integer, primary_key=True)
-
-    name = db.Column(db.String, nullable=False)
-    city = db.Column(db.String(120), nullable=False)
-    state = db.Column(db.String(120), nullable=False)
-    phone = db.Column(db.String(120))
-    image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
-    website = db.Column(db.String(120))
-    genres = db.Column(db.ARRAY(db.String()))
-    seeking_venue = db.Column(db.Boolean, default=False)
-    seeking_description = db.Column(db.Text, nullable=True)
-
-    # Relationship 
-    shows = db.relationship(
-      'Show',
-      backref='artist',
-      lazy=True,
-      cascade='all, delete-orphan'
-    )
-
-    def __repr__(self):
-      massege = f'< Artist {self.id}\nname: {self.name}\narea: {self.city},{self.state}\nphone: {self.phone}\nseeking_venue: {self.seeking_venue}\ngenres: {self.genres}>'
-      return massege
-    
-    #helper methods
-    # ___________________________ 
-    #List of Id's for past shows
-    def past_shows(self):
-      currentTime = datetime.now()
-      #shows = self.shows.query.filter_by(Show.start_time <= currentTime).all()
-      shows = [show for show in self.shows if show.start_time <= datetime.now()]
-      return shows
-
-    #List of Id's for coming shows
-    def coming_shows(self):
-      shows = [show for show in self.shows if show.start_time > datetime.now()]
-      #shows = self.shows.query.filter_by(Show.start_time > currentTime).all()
-      return shows
-
-class Show(db.Model):
-  __tablename__ = 'shows'
-
-
-  # Table Columns
-  id = db.Column(db.Integer, primary_key=True)
-  start_time = db.Column(db.DateTime, nullable=False)
-  venue_id = db.Column(
-    db.Integer,
-    db.ForeignKey('venues.id'),
-    nullable=False
-  )
-  artist_id = db.Column(
-    db.Integer,
-    db.ForeignKey('artists.id'),
-    nullable=False
-  )
-
-
-  def __repr__(self):
-    massege = f'< Show {self.id}\n Starts at {self.start_time}\nartist {self.artist_id}\n venue {self.venue_id}>'
-    return massege
 
 #----------------------------------------------------------------------------#
 # Filters.
