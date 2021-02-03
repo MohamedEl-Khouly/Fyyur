@@ -1,0 +1,22 @@
+alembic==1.5.3
+Babel==2.9.0
+certifi==2020.12.5
+click==7.1.2
+Flask==1.1.2
+Flask-Migrate==2.6.0
+Flask-Moment==0.11.0
+Flask-SQLAlchemy @ file:///tmp/build/80754af9/flask-sqlalchemy_1596836624296/work
+Flask-WTF==0.14.3
+itsdangerous==1.1.0
+Jinja2==2.11.2
+Mako==1.1.4
+MarkupSafe @ file:///tmp/build/80754af9/markupsafe_1607027305082/work
+psycopg2 @ file:///tmp/build/80754af9/psycopg2_1608147602433/work
+python-dateutil==2.6.0
+python-dotenv @ file:///home/conda/feedstock_root/build_artifacts/python-dotenv_1603979006023/work
+python-editor==1.0.4
+pytz==2020.5
+six==1.15.0
+SQLAlchemy @ file:///tmp/build/80754af9/sqlalchemy_1608243743172/work
+Werkzeug==1.0.1
+WTForms==2.3.3
