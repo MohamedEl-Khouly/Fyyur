@@ -12,7 +12,6 @@ from flask import (
   url_for
 )
 from flask_moment import Moment
-from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import logging
 from logging import Formatter, FileHandler
@@ -76,7 +75,8 @@ def venues():
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
   search_term = request.form.get('search_term')
-  venues = Venue.query.filter(func.lower(Venue.name).like('%'+search_term.lower()+"%")).all()
+  venues = Venue.query.filter(func.lower(Venue.name).\
+    like('%'+search_term.lower()+"%")).all()
   data = []
   
   for venue in venues:
@@ -89,7 +89,11 @@ def search_venues():
     'count': len(data),
     'data' : data
   }
-  return render_template('pages/search_venues.html', results=response, search_term=request.form.get('search_term', ''))
+  return render_template(
+    'pages/search_venues.html', 
+    results=response, 
+    search_term=request.form.get('search_term', '')
+  )
 
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
