@@ -6,7 +6,12 @@ from wtforms import (
   SelectMultipleField,
   DateTimeField
 )
-from wtforms.validators import DataRequired, AnyOf, URL, Regexp
+from wtforms.validators import (
+  DataRequired, 
+  AnyOf, URL,
+  Regexp,
+  Optional
+)
 from wtforms.fields.core import BooleanField
 from enums import State, Genre
 
@@ -65,9 +70,17 @@ class VenueForm(Form):
     )
     facebook_link = StringField(
         'facebook_link', 
+        validators=[
+          Optional(),
+          URL()
+        ]
     )
     website = StringField(
-        'website', 
+        'website',
+        validators=[
+          Optional(),
+          URL()
+        ] 
     )    
     seeking_talent = BooleanField(
         'seeking_talent'
@@ -90,6 +103,7 @@ class VenueForm(Form):
       if self.state.data not in dict(State.choices()).keys():
         self.state.errors.append('Invalid state.')
         return False
+      
       return True
 class ArtistForm(Form):
     name = StringField(
@@ -112,6 +126,10 @@ class ArtistForm(Form):
     )
     facebook_link = StringField(
         'facebook_link',
+        validators=[
+          Optional(),
+          URL()
+        ]
     )
     phone = StringField(
         'phone',
@@ -126,7 +144,11 @@ class ArtistForm(Form):
         'image_link'
     )
     website = StringField(
-        'website', 
+        'website',
+        validators=[
+          Optional(),
+          URL()
+        ] 
     )
     seeking_venue = BooleanField(
         'seeking_venue'        
