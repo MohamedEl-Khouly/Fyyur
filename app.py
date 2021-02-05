@@ -15,7 +15,6 @@ from flask_moment import Moment
 from flask_migrate import Migrate
 import logging
 from logging import Formatter, FileHandler
-from flask_wtf import Form
 from forms import *
 from sqlalchemy import func, desc
 from models import db, Artist, Venue, Show
@@ -151,43 +150,25 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  try :
-    name = request.form.get('name')
-    city = request.form.get('city')
-    state = request.form.get('state')
-    phone = request.form.get('phone')
-    address = request.form.get('address')
-    website_link = request.form.get('website_link')
-    facebook_link = request.form.get('facebook_link')
-    if request.form.get('seeking_talent') in ('y', True, 't', 'True'):
-      seeking_talent = True
-    else:
-      seeking_talent = False
-    seeking_description = request.form.get('seeking_description')
-    image_link = request.form.get('image_link')
-    genres = request.form.getlist('genres')
-    new_venue = Venue(
-      name= name,
-      city= city,
-      state= state,
-      phone= phone,
-      address= address,
-      facebook_link=facebook_link,
-      website= website_link,
-      seeking_talent= seeking_talent,
-      seeking_description= seeking_description,
-      genres= genres,
-      image_link=image_link
-    )
-    db.session.add(new_venue)
-    db.session.commit()
-    flash('Venue ' + new_venue.name + ' was successfully listed!')
-  except :
-    db.session.rollback()
-    flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
-  finally:
-    db.session.close()
-  return render_template('pages/venues.html')
+  form = VenueForm(request.form, meta={'csrf': False})
+  if form.validate():
+    try :
+      new_venue = Venue()
+      form.populate_obj(new_venue)
+      db.session.add(new_venue)
+      db.session.commit()
+      flash('Venue ' + new_venue.name + ' was successfully listed!')
+    except :
+      db.session.rollback()
+      flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
+    finally:
+      db.session.close()
+  else :
+    message = []
+    for field, err in form.errors.items():
+        message.append(field + ' ' + '|'.join(err))
+    flash('Errors ' + str(message))
+  return redirect(url_for('venues'))
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
@@ -275,62 +256,48 @@ def edit_artist(artist_id):
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
-  try :
-    artist=Artist.query.get(artist_id)
-    artist.name = request.form.get('name')
-    artist.city = request.form.get('city')
-    artist.state = request.form.get('state')
-    artist.phone = request.form.get('phone')
-    artist.website = request.form.get('website_link')
-    artist.facebook_link = request.form.get('facebook_link')
-    if request.form.get('seeking_venue') in ('y', True, 't', 'True'):
-      artist.seeking_venue = True
-    else:
-      artist.seeking_venue = False
-    artist.seeking_description = request.form.get('seeking_description')
-    artist.genres = request.form.getlist('genres')
-    artist.image_link = request.form.get('image_link')
-    db.session.commit()
-    flash('Artist ' + new_artist.name + ' was successfully Updated!')
-  except :
-    db.session.rollback()
-    flash('An error occurred. Artist' + request.form['name'] + ' could not be Updated.')
-  finally:
-    db.session.close()
+  artist=Artist.query.get(artist_id)
+  form = ArtistForm(request.form, meta={'csrf':False})
+  if form.validate():
+    try :
+      form.populate_obj(artist)
+      db.session.commit()
+      flash('Artist ' + artist.name + ' was successfully Updated!')
+    except Exception as e:
+      print(e)
+      db.session.rollback()
+      flash('An error occurred. Artist' + request.form['name'] + ' could not be Updated.')
+    finally:
+      db.session.close()
 
-  return redirect(url_for('show_artist', artist_id=artist_id))
+    return redirect(url_for('show_artist', artist_id=artist_id))
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
-  venue = Venue.query.get(venue_id) 
+  venue = Venue.query.get(venue_id)
   form = VenueForm(obj=venue)
   return render_template('forms/edit_venue.html', form=form, venue=venue)
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-  try :
-    venue = Venue.query.get(venue_id)
-    venue.name = request.form.get('name')
-    venue.city = request.form.get('city')
-    venue.state = request.form.get('state')
-    venue.phone = request.form.get('phone')
-    venue.address = request.form.get('address')
-    venue.website = request.form.get('website_link')
-    venue.facebook_link = request.form.get('facebook_link')
-    if request.form.get('seeking_talent') in ('y', True, 't', 'True'):
-      venue.seeking_talent = True
-    else:
-      venue.seeking_talent = False
-    venue.seeking_description = request.form.get('seeking_description')
-    venue.image_link = request.form.get('image_link')
-    venue.genres = request.form.getlist('genres')
-    db.session.commit()
-    flash('Venue ' + new_venue.name + ' was successfully Updated!')
-  except :
-    db.session.rollback()
-    flash('An error occurred. Venue ' + request.form['name'] + ' could not be Updated.')
-  finally:
-    db.session.close()
+  venue = Venue.query.get(venue_id)
+  form = VenueForm(request.form, meta={'csrf': False})
+  if form.validate():
+    try :
+      form.populate_obj(venue)
+      db.session.commit()
+      flash('Venue ' + venue.name + ' was successfully edited!')
+    except Exception as e:
+      print(e)
+      db.session.rollback()
+      flash('An error occurred. Venue ' + request.form['name'] + ' could not be edited.')
+    finally:
+      db.session.close()
+  else :
+    message = []
+    for field, err in form.errors.items():
+        message.append(field + ' ' + '|'.join(err))
+    flash('Errors ' + str(message))
   return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Create Artist
@@ -343,41 +310,25 @@ def create_artist_form():
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
-  try :
-    name = request.form.get('name')
-    city = request.form.get('city')
-    state = request.form.get('state')
-    phone = request.form.get('phone')
-    website_link = request.form.get('website_link')
-    facebook_link = request.form.get('facebook_link')
-    if request.form.get('seeking_venue') in ('y', True, 't', 'True'):
-      seeking_venue = True
-    else:
-      seeking_venue = False
-    seeking_description = request.form.get('seeking_description')
-    genres = request.form.getlist('genres')
-    image_link = request.form.get('image_link')
-    new_artist = Artist(
-      name= name,
-      city= city,
-      state= state,
-      phone= phone,
-      facebook_link=facebook_link,
-      website= website_link,
-      seeking_venue= seeking_venue,
-      seeking_description= seeking_description,
-      genres= genres,
-      image_link= image_link
-    )
-    db.session.add(new_artist)
-    db.session.commit()
-    flash('Artist ' + new_artist.name + ' was successfully listed!')
-  except :
-    db.session.rollback()
-    flash('An error occurred. Artist' + request.form['name'] + ' could not be listed.')
-  finally:
-    db.session.close()
-  return render_template('pages/artists.html')
+  form = ArtistForm(request.form, meta={'csrf': False})
+  if form.validate():
+    try :
+      new_artist = Artist()
+      form.populate_obj(new_artist)
+      db.session.add(new_artist)
+      db.session.commit()
+      flash('Artist ' + new_artist.name + ' was successfully listed!')
+    except :
+      db.session.rollback()
+      flash('An error occurred. Artist ' + request.form['name'] + ' could not be listed.')
+    finally:
+      db.session.close()
+  else :
+    message = []
+    for field, err in form.errors.items():
+        message.append(field + ' ' + '|'.join(err))
+    flash('Errors ' + str(message))
+  return redirect(url_for('artists'))
 
 
 #  Shows

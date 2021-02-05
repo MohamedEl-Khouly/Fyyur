@@ -65,11 +65,9 @@ class VenueForm(Form):
     )
     facebook_link = StringField(
         'facebook_link', 
-        validators=[URL()]
     )
-    website_link = StringField(
-        'website_link', 
-        validators=[URL()]
+    website = StringField(
+        'website', 
     )    
     seeking_talent = BooleanField(
         'seeking_talent'
@@ -83,7 +81,7 @@ class VenueForm(Form):
       """
       Fuction to define custom validations
       """
-      rv = FlaskForm.validate(self)
+      rv = Form.validate(self)
       if not rv :
         return False
       if not set(self.genres.data).issubset(dict(Genre.choices()).keys()):
@@ -114,7 +112,6 @@ class ArtistForm(Form):
     )
     facebook_link = StringField(
         'facebook_link',
-         validators=[URL()]
     )
     phone = StringField(
         'phone',
@@ -128,9 +125,8 @@ class ArtistForm(Form):
     image_link = StringField(
         'image_link'
     )
-    website_link = StringField(
-        'website_link', 
-        validators=[URL()]
+    website = StringField(
+        'website', 
     )
     seeking_venue = BooleanField(
         'seeking_venue'        
@@ -142,7 +138,7 @@ class ArtistForm(Form):
       """
       Fuction to define custom validations
       """
-      rv = FlaskForm.validate(self)
+      rv = Form.validate(self)
       if not rv :
         return False
       if not set(self.genres.data).issubset(dict(Genre.choices()).keys()):
@@ -151,4 +147,6 @@ class ArtistForm(Form):
       if self.state.data not in dict(State.choices()).keys():
         self.state.errors.append('Invalid state.')
         return False
+      
+      print(self.website._value())
       return True
