@@ -79,6 +79,20 @@ class VenueForm(Form):
         'seeking_description'
     )
 
+    def validate(self):
+      """
+      Fuction to define custom validations
+      """
+      rv = FlaskForm.validate(self)
+      if not rv :
+        return False
+      if not set(self.genres.data).issubset(dict(Genre.choices()).keys()):
+        self.genres.errors.append('Invalid genre.')
+        return False
+      if self.state.data not in dict(State.choices()).keys():
+        self.state.errors.append('Invalid state.')
+        return False
+      return True
 class ArtistForm(Form):
     name = StringField(
         'name', 
@@ -124,3 +138,17 @@ class ArtistForm(Form):
     seeking_description = StringField(
         'seeking_description'
     )
+    def validate(self):
+      """
+      Fuction to define custom validations
+      """
+      rv = FlaskForm.validate(self)
+      if not rv :
+        return False
+      if not set(self.genres.data).issubset(dict(Genre.choices()).keys()):
+        self.genres.errors.append('Invalid genre.')
+        return False
+      if self.state.data not in dict(State.choices()).keys():
+        self.state.errors.append('Invalid state.')
+        return False
+      return True
